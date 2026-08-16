@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analisis Historis IHSG (1995–2026) dengan SQL — Case Study</title>
+<meta name="description" content="Analisis 31 tahun data historis IHSG menggunakan SQL murni di PostgreSQL: dari query dasar, agregasi, JOIN, CTE, hingga window functions dan data quality checks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <span class="site-header__name">Nama Kamu.</span>
+    <a href="#" class="btn btn--ghost btn--small">← Back to Portfolio</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Case Study</p>
+      <h1 class="hero__title">
+        Analisis Historis<br><span class="text-gradient">IHSG dengan SQL</span>
+      </h1>
+      <p class="hero__subtitle">31 Tahun Data Pasar Modal Indonesia — Dianalisis Murni Menggunakan SQL, dari Query Dasar Sampai Window Functions</p>
+
+      <div class="tag-list">
+        <span class="tag">SQL</span>
+        <span class="tag">POSTGRESQL</span>
+        <span class="tag">DATA MANAGEMENT</span>
+        <span class="tag">WINDOW FUNCTIONS</span>
+        <span class="tag">DATA QUALITY</span>
+      </div>
+
+      <p class="hero__desc">
+        Sebuah project menelusuri 7.681 hari perdagangan Indeks Harga Saham Gabungan (IHSG) sepanjang 31 tahun (1995–2026), menggunakan bahasa database bernama <span class="term">SQL (Structured Query Language — cara "bertanya" ke database dan menyaring jutaan baris data jadi jawaban yang ringkas)</span>. Semua database-nya dikelola di PostgreSQL <span class="term">(salah satu sistem database yang paling umum dipakai di dunia)</span>. Seluruh temuan di halaman ini didapat langsung dari hasil bertanya ke data — bukan tebakan atau data yang diketik manual.
+      </p>
+
+      <div class="hero__actions">
+        <a href="https://github.com/USERNAME-GITHUB-KAMU/ihsg-sql-analysis" target="_blank" rel="noopener" class="btn btn--primary">View Source Code ↗</a>
+        <a href="#findings" class="btn btn--outline">Lihat Temuan ↓</a>
+      </div>
+
+      <div class="hero__stats">
+        <div class="hero__stat">
+          <span class="stat-num">31</span>
+          <span class="stat-label">Tahun Data</span>
+        </div>
+        <div class="hero__stat">
+          <span class="stat-num">7.681</span>
+          <span class="stat-label">Hari Perdagangan</span>
+        </div>
+        <div class="hero__stat">
+          <span class="stat-num">5</span>
+          <span class="stat-label">Tingkat Kesulitan (Dasar → Lanjutan)</span>
+        </div>
+        <div class="hero__stat">
+          <span class="stat-num">20+</span>
+          <span class="stat-label">Pertanyaan Dijawab Lewat SQL</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TENTANG DATASET ============ -->
+  <section class="section">
+    <div class="container">
+    <div class="split">
+      <div class="split__label">
+        <p class="section-eyebrow">Tentang Dataset</p>
+        <h2 class="section-title">Data apa yang dianalisis?</h2>
+        <p class="section-lead">
+          Sebelum masuk ke query, penting memahami dulu bentuk data mentahnya — supaya semua angka di halaman ini punya konteks yang jelas.
+        </p>
+      </div>
+      <div class="split__content">
+      <div class="dataset-meta">
+        <div class="dataset-meta__item">
+          <span class="dataset-meta__num">7.681</span>
+          <span class="dataset-meta__label">Baris (hari perdagangan)</span>
+        </div>
+        <div class="dataset-meta__item">
+          <span class="dataset-meta__num">6</span>
+          <span class="dataset-meta__label">Kolom asli</span>
+        </div>
+        <div class="dataset-meta__item">
+          <span class="dataset-meta__num">1995–2026</span>
+          <span class="dataset-meta__label">Rentang waktu</span>
+        </div>
+      </div>
+
+      <p class="body-text">
+        Data mentah harga harian IHSG (format file CSV) dimasukkan ke sebuah tabel database bernama <code>ihsg_daily</code>. Ada juga satu tabel kecil kedua, <code>market_events</code>, isinya empat momen paling ekstrem sepanjang sejarah data (kenaikan/penurunan harian terbesar, harga tertinggi/terendah) — <strong>semuanya ditemukan lewat query ke data itu sendiri</strong>, bukan tanggal yang diketik dari hafalan atau internet, supaya bisa sepenuhnya dipertanggungjawabkan.
+      </p>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Nama Kolom</th><th>Isinya Apa</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>trade_date</code></td><td>Tanggal bursa saham buka dan ada transaksi.</td></tr>
+            <tr><td><code>open_price</code></td><td>Posisi IHSG saat pasar resmi dibuka di pagi hari.</td></tr>
+            <tr><td><code>high_price</code></td><td>Titik tertinggi yang dicapai IHSG sepanjang hari itu.</td></tr>
+            <tr><td><code>low_price</code></td><td>Titik terendah yang disentuh IHSG sepanjang hari itu.</td></tr>
+            <tr><td><code>close_price</code></td><td>Nilai akhir IHSG saat pasar tutup — kolom yang paling sering dipakai di halaman ini karena paling mencerminkan "harga resmi" hari itu.</td></tr>
+            <tr><td><code>volume</code></td><td>Total lembar saham yang diperjualbelikan pada hari itu — makin besar, makin ramai aktivitas pasar.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <strong>Seberapa bersih datanya?</strong> Ditemukan 109 baris (1,4% dari total) yang <code>volume</code>-nya tercatat 0, kebanyakan dari tahun 1995 — kemungkinan besar karena pencatatan jumlah transaksi belum konsisten di masa awal bursa Indonesia. Tidak ditemukan satu pun baris yang datanya "mustahil" secara logika (misalnya harga tertinggi hari itu lebih rendah dari harga terendahnya) — jadi data ini bisa dipercaya untuk dianalisis.
+      </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ ANALYSIS APPROACH ============ -->
+  <section class="section section--alt">
+    <div class="container">
+    <div class="split">
+      <div class="split__label">
+      <p class="section-eyebrow">Analysis Approach</p>
+      <h2 class="section-title">Alur pengerjaan</h2>
+      <p class="section-lead">Prosesnya bertahap, mulai dari pertanyaan paling sederhana sampai yang butuh logika lebih rumit — semua tercatat rapi di file <code>queries_postgres.sql</code> supaya bisa ditelusuri ulang.</p>
+      </div>
+      <div class="split__content">
+      <div class="flow">
+        <div class="flow__step">
+          <span class="flow__num">Tahap 1 — Pertanyaan Dasar</span>
+          <p>Pertanyaan sederhana seperti "kapan harga IHSG paling tinggi?" atau "bagaimana pergerakannya di tahun tertentu?"</p>
+        </div>
+        <div class="flow__step">
+          <span class="flow__num">Tahap 2 — Merangkum Data</span>
+          <p>Meringkas ribuan baris data harian menjadi angka per tahun — misalnya rata-rata, tertinggi, dan terendah tiap tahun.</p>
+        </div>
+        <div class="flow__step">
+          <span class="flow__num">Tahap 3 — Menggabungkan Data</span>
+          <p>Menggabungkan dua tabel berbeda supaya bisa melihat konteks harga di sekitar tanggal-tanggal penting.</p>
+        </div>
+        <div class="flow__step">
+          <span class="flow__num">Tahap 4 — Analisis Tren Lanjutan</span>
+          <p>Menghitung perubahan harga hari-ke-hari, tren rata-rata bergerak, dan mendeteksi sinyal secara otomatis dari pola data.</p>
+        </div>
+        <div class="flow__step">
+          <span class="flow__num">Tahap 5 — Memastikan Data Bisa Dipercaya</span>
+          <p>Mengecek data yang aneh atau tidak masuk akal, lalu menyimpan pertanyaan yang sering dipakai supaya bisa dipanggil ulang dengan cepat.</p>
+        </div>
+      </div>
+
+      <div class="tools-row">
+        <span class="tool-chip">PostgreSQL <span class="term">(sistem database)</span></span>
+        <span class="tool-chip">pgAdmin <span class="term">(aplikasi buat mengelolanya)</span></span>
+        <span class="tool-chip">SQL murni <span class="term">(tanpa tools tambahan)</span></span>
+      </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ KEY FINDINGS ============ -->
+  <section class="section" id="findings">
+    <div class="container">
+      <p class="section-eyebrow">Key Findings</p>
+      <h2 class="section-title">Empat angka utama</h2>
+
+      <div class="bento">
+        <div class="bento__card">
+          <span class="bento__value">13,26x</span>
+          <span class="bento__label">Pertumbuhan Sejak 1995</span>
+          <p class="bento__desc">Nilai IHSG tumbuh 13,26 kali lipat (naik 1.226%) dari 470 poin di Januari 1995 menjadi 6.234 poin di data terakhir (Agustus 2026).</p>
+        </div>
+        <div class="bento__card">
+          <span class="bento__value">-11,95%</span>
+          <span class="bento__label">Hari Terburuk Sepanjang Sejarah</span>
+          <p class="bento__desc">8 Januari 1998 — hari dengan penurunan harga dalam satu hari yang paling parah, terjadi saat krisis moneter 1998.</p>
+        </div>
+        <div class="bento__card">
+          <span class="bento__value">256,82</span>
+          <span class="bento__label">Titik Terendah Sepanjang Sejarah</span>
+          <p class="bento__desc">21 September 1998 — angka terendah yang pernah dicapai IHSG dalam 31 tahun data ini.</p>
+        </div>
+        <div class="bento__card">
+          <span class="bento__value">41 jeda</span>
+          <span class="bento__label">Hari Bursa Tutup Cukup Lama</span>
+          <p class="bento__desc">Terdeteksi 41 jeda waktu di mana bursa tidak beroperasi lebih dari 5 hari berturut-turut — semuanya cocok dengan libur nasional seperti Lebaran dan Tahun Baru.</p>
+        </div>
+      </div>
+
+      <p class="bento-note">Semua angka di atas didapat langsung dari hasil "bertanya" ke data lewat SQL — bukan diambil dari artikel atau sumber luar.</p>
+    </div>
+  </section>
+
+  <!-- ============ DEEP DIVE ============ -->
+  <section class="section section--alt">
+    <div class="container">
+    <div class="split">
+      <div class="split__label">
+      <p class="section-eyebrow">Cerita di Balik Angka</p>
+      <h2 class="section-title">5 temuan paling menarik</h2>
+      </div>
+      <div class="split__content">
+
+      <!-- Finding 1 -->
+      <article class="finding">
+        <h3 class="finding__q">Bagaimana pertumbuhan IHSG setiap tahunnya?</h3>
+        <p class="body-text">Dengan meringkas data harian jadi rata-rata per tahun, terlihat harga IHSG naik dari 473,67 (tahun 1995) menjadi 7.163,22 (2026, data masih berjalan). Aktivitas jual-beli sahamnya naik jauh lebih drastis lagi: dari 71 juta lembar saham (1995) menjadi 63 miliar lembar (2025) — lebih dari 800 kali lipat lebih ramai.</p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Tahun</th><th>Rata-rata Harga</th><th>Peringkat</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>2025</td><td>7.449,72</td><td>#1 tertinggi</td></tr>
+              <tr><td>2024</td><td>7.311,51</td><td>#2</td></tr>
+              <tr><td>2001</td><td>404,42</td><td>#32 (paling rendah)</td></tr>
+              <tr><td>1998</td><td>416,81</td><td>#31</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout--insight">
+          <strong>Temuan menarik:</strong> Tahun dengan rata-rata harga paling rendah ternyata <strong>bukan 1998</strong> (tahun krisis moneter yang paling dikenal orang), melainkan <strong>2001</strong> — sesuatu yang baru ketahuan setelah datanya benar-benar diperiksa, bukan asumsi dari cerita umum.
+        </div>
+      </article>
+
+      <!-- Finding 2 -->
+      <article class="finding">
+        <h3 class="finding__q">Apa yang terjadi di sekitar hari-hari ekstrem itu?</h3>
+        <p class="body-text">Bukan cuma lihat 1 hari doang, tapi juga 5 hari sebelum dan sesudahnya — supaya kelihatan apakah kejadian itu tiba-tiba atau memang bagian dari tren yang sedang berjalan.</p>
+        <div class="callout callout--insight">
+          <strong>Temuan menarik:</strong> Titik terendah 21 September 1998 bukan kejadian sesaat — data menunjukkan IHSG langsung mulai naik lagi cuma 2 hari setelahnya, artinya itu memang "titik dasar" sebelum harga pulih. Sebaliknya, hari terburuk (8 Januari 1998) itu bukan kejutan tiba-tiba, melainkan puncak dari tren turun yang sudah berlangsung beberapa hari sebelumnya.
+        </div>
+      </article>
+
+      <!-- Finding 3 -->
+      <article class="finding">
+        <h3 class="finding__q">Bisakah komputer "melihat" sinyal tren secara otomatis?</h3>
+        <p class="body-text">Dihitung <span class="term">rata-rata bergerak (moving average)</span> — semacam rata-rata harga 20 hari terakhir dan 50 hari terakhir yang terus diperbarui tiap hari — lalu dicek otomatis kapan garis rata-rata jangka pendek (20 hari) melewati garis rata-rata jangka panjang (50 hari). Momen itu sering dianggap trader sebagai sinyal bahwa tren sedang berbalik naik <span class="term">("Golden Cross")</span>.</p>
+        <div class="callout callout--insight">
+          <strong>Temuan menarik:</strong> Sinyal seperti ini baru saja terbentuk di akhir Juli 2026 pada data terbaru — menunjukkan bahwa pola semacam ini bisa dideteksi otomatis langsung dari database, tanpa perlu software analisis saham tambahan.
+        </div>
+      </article>
+
+      <!-- Finding 4 -->
+      <article class="finding">
+        <h3 class="finding__q">Kapan hari terbaik &amp; terburuk sepanjang sejarah IHSG?</h3>
+        <p class="body-text">Dihitung perubahan harga dari hari ke hari (dalam persen), lalu diurutkan untuk menemukan 10 hari dengan kenaikan dan penurunan paling ekstrem.</p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Tanggal</th><th>Perubahan Harga</th><th>Konteks</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>2 Feb 1998</td><td>+14,03%</td><td>Kenaikan harian terbesar sepanjang sejarah</td></tr>
+              <tr><td>8 Jan 1998</td><td>-11,95%</td><td>Penurunan harian terbesar sepanjang sejarah</td></tr>
+              <tr><td>26 Mar 2020</td><td>+10,19%</td><td>Pemulihan tajam setelah crash COVID-19</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout--insight">
+          <strong>Temuan menarik:</strong> 7 dari 10 kenaikan harian terbesar terjadi di sekitar krisis 1997–1998. Ini pola yang cukup umum di pasar saham: setelah harga jatuh sangat dalam, biasanya diikuti lonjakan naik yang juga sangat tajam — bukan pas pasar lagi tenang-tenang saja.
+        </div>
+      </article>
+
+      <!-- Finding 5 -->
+      <article class="finding">
+        <h3 class="finding__q">Apakah data ini bisa dipercaya?</h3>
+        <p class="body-text">Sebelum sebuah data dipakai untuk analisis, penting dicek dulu apakah datanya masuk akal. Tiga pengecekan dilakukan: data yang aktivitasnya tercatat nol, data yang secara logika mustahil (misalnya harga tertinggi hari itu lebih rendah dari harga terendahnya), dan jeda tanggal yang tidak wajar.</p>
+        <div class="stat-row">
+          <span class="stat-chip stat-chip--yes">0 data yang mustahil secara logika</span>
+          <span class="stat-chip">109 baris aktivitas tercatat nol (1,4%)</span>
+          <span class="stat-chip">41 jeda tanggal, semua = libur nasional</span>
+        </div>
+        <div class="callout callout--insight">
+          <strong>Temuan menarik:</strong> Datanya masuk akal secara logika, dan semua jeda tanggal bisa dijelaskan sepenuhnya oleh kalender libur Indonesia (Lebaran, Tahun Baru) — bukan tanda data yang hilang atau rusak.
+        </div>
+      </article>
+
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ SOURCE CODE ============ -->
+  <section class="section section--cta">
+    <div class="container container--narrow center">
+      <h2 class="section-title">Penasaran dengan kodenya?</h2>
+      <p class="body-text">Untuk pembaca yang lebih teknis: seluruh 20+ pertanyaan SQL di atas — dari yang paling sederhana sampai paling kompleks — didokumentasikan lengkap dengan penjelasan di repository GitHub berikut, beserta struktur database dan langkah setup-nya.</p>
+      <a href="https://github.com/USERNAME-GITHUB-KAMU/ihsg-sql-analysis" target="_blank" rel="noopener" class="btn btn--primary btn--large">View Source Code on GitHub ↗</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <span>© 2026 Nama Kamu.</span>
+    <a href="#" class="btn btn--ghost btn--small">← Back to Portfolio</a>
+  </div>
+</footer>
+
+</body>
+</html>
