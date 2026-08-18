@@ -68,6 +68,20 @@
     </div>
   </section>
 
+  <!-- ============ PROBLEM STATEMENT ============ -->
+  <section class="section">
+    <div class="container container--narrow">
+      <p class="section-eyebrow">Problem Statement</p>
+      <h2 class="section-title">Pertanyaan yang ingin dijawab</h2>
+      <p class="pull-quote">
+        Bagaimana pola pertumbuhan, momen krisis, dan karakteristik data IHSG selama periode 1995–2026 dapat diidentifikasi dan divalidasi murni menggunakan query SQL bertingkat — dari agregasi dasar sampai window functions <span class="term">(fungsi SQL yang bisa "melihat" baris-baris data lain di sekitarnya, misalnya harga tertinggi sejauh ini, tanpa harus meringkas datanya jadi satu angka saja)</span>?
+      </p>
+      <p class="body-text">
+        Pertanyaan besar itu dipecah jadi 5 pertanyaan riset yang lebih spesifik di bawah — masing-masing dijawab langsung dari hasil query ke tabel <code>ihsg_daily</code>, tanpa alat analisis statistik atau bahasa pemrograman lain di luar SQL.
+      </p>
+    </div>
+  </section>
+
   <!-- ============ TENTANG DATASET ============ -->
   <section class="section">
     <div class="container">
@@ -166,8 +180,131 @@
     </div>
   </section>
 
+  <!-- ============ 5 PERTANYAAN RISET ============ -->
+  <section class="section">
+    <div class="container">
+    <div class="split">
+      <div class="split__label">
+        <p class="section-eyebrow">5 Pertanyaan Riset</p>
+        <h2 class="section-title">Pertanyaan yang dijawab langsung dari data</h2>
+        <p class="section-lead">Problem statement di atas dipecah jadi 5 pertanyaan konkret. Semua angka di bawah dihitung murni pakai SQL (PostgreSQL) — window functions, <code>STDDEV()</code>, dan <code>CORR()</code> — bukan uji statistik formal, bukan Python/pandas/scipy.</p>
+      </div>
+      <div class="split__content">
+
+      <!-- Q1 -->
+      <article class="finding">
+        <h3 class="finding__q">Q1 — Bagaimana pertumbuhan IHSG dari 1995–2026, dan tahun mana paling ekstrem naik/turun?</h3>
+        <p class="body-text">Data harian diringkas jadi rata-rata per tahun, lalu dibandingkan tahun demi tahun untuk melihat lonjakan dan penurunan paling mencolok.</p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Metrik</th><th>Nilai</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Cumulative return <span class="term">(total pertumbuhan sejak awal data)</span></td><td>+1.226% (13,26x lipat)</td></tr>
+              <tr><td>Rata-rata Close tertinggi</td><td>2025 (7.449,72)</td></tr>
+              <tr><td>Rata-rata Close terendah</td><td>2001 (404,42) — lebih rendah dari 1998 (416,81)</td></tr>
+              <tr><td>Lonjakan tahunan terbesar</td><td>2010 (+1.074,88) — pemulihan pasca krisis 2008</td></tr>
+              <tr><td>Penurunan tahunan terbesar</td><td>2020 (-1.047,11) — dampak COVID-19</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout--insight">
+          <strong>Temuan menarik:</strong> Tahun dengan rata-rata harga paling rendah ternyata <strong>bukan 1998</strong> (tahun krisis moneter yang paling dikenal orang), melainkan <strong>2001</strong>. Lonjakan tahunan terbesar (2010) dan penurunan tahunan terbesar (2020) sama-sama muncul tepat setelah krisis besar (2008 dan awal COVID-19) — pola yang sama, arah berlawanan.
+        </div>
+      </article>
+
+      <!-- Q2 -->
+      <article class="finding">
+        <h3 class="finding__q">Q2 — Seberapa dalam drawdown krisis terbesar, dan berapa lama pemulihannya?</h3>
+        <p class="body-text">Dihitung pakai window function <code>MAX() OVER (ROWS UNBOUNDED PRECEDING)</code> <span class="term">(fungsi yang melacak harga tertinggi yang pernah dicapai sampai hari itu — disebut "running peak" atau puncak berjalan)</span> untuk membandingkan tiap harga penutupan dengan puncak tertingginya sejauh itu, lalu mencari titik yang selisihnya paling besar.</p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Metrik</th><th>Nilai</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Puncak sebelum jatuh</td><td>740,80</td></tr>
+              <tr><td>Titik terendah</td><td>256,82 (21 September 1998)</td></tr>
+              <tr><td>Drawdown terdalam <span class="term">(persentase penurunan dari puncak ke titik terendah)</span></td><td>-65,33%</td></tr>
+              <tr><td>Tanggal pemulihan penuh <span class="term">(harga kembali menyamai puncak sebelumnya)</span></td><td>9 Januari 2004</td></tr>
+              <tr><td>Lama pemulihan</td><td>1.936 hari (~5,3 tahun)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout--insight">
+          <strong>Temuan menarik:</strong> Butuh lebih dari 5 tahun bagi IHSG untuk kembali ke level sebelum krisis 1997–1998 — jauh lebih lama dari drop-nya sendiri, yang menegaskan bahwa krisis moneter itu bukan cuma penurunan tajam sesaat, tapi luka yang butuh waktu sangat panjang untuk pulih.
+        </div>
+      </article>
+
+      <!-- Q3 -->
+      <article class="finding">
+        <h3 class="finding__q">Q3 — Apakah volatilitas berubah dari dekade ke dekade?</h3>
+        <p class="body-text">Volatilitas <span class="term">(seberapa besar dan sering harga naik-turun — makin tinggi, makin "liar" pergerakannya)</span> dihitung pakai <code>STDDEV()</code> dari return harian tiap dekade, lalu disetahunkan.</p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Dekade</th><th>Volatilitas Harian</th><th>Volatilitas Tahunan</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1990-an</td><td>2,11%</td><td>33,50%</td></tr>
+              <tr><td>2000-an</td><td>1,55%</td><td>24,55%</td></tr>
+              <tr><td>2010-an</td><td>1,04%</td><td>16,52%</td></tr>
+              <tr><td>2020-an</td><td>1,16%</td><td>18,47%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout--insight">
+          <strong>Temuan menarik:</strong> Volatilitas menurun tajam dari 1990-an ke 2010-an, lalu naik lagi sedikit di 2020-an — kemungkinan efek COVID-19 dan gejolak pasar global.
+        </div>
+      </article>
+
+      <!-- Q4 -->
+      <article class="finding">
+        <h3 class="finding__q">Q4 — Adakah pola musiman yang konsisten setiap tahun?</h3>
+        <p class="body-text">Return harian dikelompokkan per bulan (digabung dari semua tahun), lalu dirata-ratakan untuk melihat bulan mana yang secara historis cenderung naik atau turun.</p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Bulan</th><th>Rata-rata Return Harian</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Desember</td><td>+0,2015% (tertinggi)</td></tr>
+              <tr><td>Agustus</td><td>-0,1545% (terendah, satu-satunya bulan negatif)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout--insight">
+          <strong>Temuan menarik:</strong> Desember konsisten jadi bulan dengan rata-rata return harian tertinggi, mengindikasikan pola rally akhir tahun — sementara Agustus jadi satu-satunya bulan dengan rata-rata negatif.
+        </div>
+      </article>
+
+      <!-- Q5 -->
+      <article class="finding">
+        <h3 class="finding__q">Q5 — Apakah volume perdagangan berkaitan dengan besaran pergerakan harga?</h3>
+        <p class="body-text">Dihitung korelasi <span class="term">(<code>CORR()</code> — angka antara -1 sampai 1 yang menunjukkan seberapa erat dua hal bergerak bersamaan; makin dekat ke 0, makin tidak berkaitan)</span> antara volume harian dan besaran perubahan harga hari itu (nilai absolut).</p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Metrik</th><th>Nilai</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Korelasi volume vs besaran pergerakan harga harian</td><td>-0,0183</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout--insight">
+          <strong>Temuan menarik:</strong> Angka -0,0183 sangat lemah, mendekati nol — artinya volume transaksi <strong>tidak berkaitan secara berarti</strong> dengan seberapa besar harga bergerak hari itu. Hari dengan transaksi ramai belum tentu hari dengan pergerakan harga yang besar, begitu juga sebaliknya.
+        </div>
+      </article>
+
+      </div>
+    </div>
+    </div>
+  </section>
+
   <!-- ============ KEY FINDINGS ============ -->
-  <section class="section" id="findings">
+  <section class="section section--alt" id="findings">
     <div class="container">
       <p class="section-eyebrow">Key Findings</p>
       <h2 class="section-title">Empat angka utama</h2>
@@ -175,91 +312,42 @@
       <div class="bento">
         <div class="bento__card">
           <span class="bento__value">13,26x</span>
-          <span class="bento__label">Pertumbuhan Sejak 1995</span>
-          <p class="bento__desc">Nilai IHSG tumbuh 13,26 kali lipat (naik 1.226%) dari 470 poin di Januari 1995 menjadi 6.234 poin di data terakhir (Agustus 2026).</p>
+          <span class="bento__label">Pertumbuhan Kumulatif</span>
+          <p class="bento__desc">Nilai IHSG tumbuh 13,26 kali lipat (cumulative return +1.226%) dari 470 poin di Januari 1995 menjadi 6.234 poin di data terakhir (Agustus 2026).</p>
         </div>
         <div class="bento__card">
-          <span class="bento__value">-11,95%</span>
-          <span class="bento__label">Hari Terburuk Sepanjang Sejarah</span>
-          <p class="bento__desc">8 Januari 1998 — hari dengan penurunan harga dalam satu hari yang paling parah, terjadi saat krisis moneter 1998.</p>
+          <span class="bento__value">-65,33%</span>
+          <span class="bento__label">Drawdown Terdalam</span>
+          <p class="bento__desc">Dari puncak 740,80 turun ke titik terendah 256,82 pada 21 September 1998 — penurunan terdalam sepanjang 31 tahun data ini.</p>
         </div>
         <div class="bento__card">
-          <span class="bento__value">256,82</span>
-          <span class="bento__label">Titik Terendah Sepanjang Sejarah</span>
-          <p class="bento__desc">21 September 1998 — angka terendah yang pernah dicapai IHSG dalam 31 tahun data ini.</p>
+          <span class="bento__value">1.936 hari</span>
+          <span class="bento__label">Lama Pemulihan</span>
+          <p class="bento__desc">Butuh sekitar 5,3 tahun sejak titik terendah 1998 sampai IHSG akhirnya pulih penuh ke level sebelum krisis, pada 9 Januari 2004.</p>
         </div>
         <div class="bento__card">
-          <span class="bento__value">41 jeda</span>
-          <span class="bento__label">Hari Bursa Tutup Cukup Lama</span>
-          <p class="bento__desc">Terdeteksi 41 jeda waktu di mana bursa tidak beroperasi lebih dari 5 hari berturut-turut — semuanya cocok dengan libur nasional seperti Lebaran dan Tahun Baru.</p>
+          <span class="bento__value">33,50% → 16,52%</span>
+          <span class="bento__label">Penurunan Volatilitas</span>
+          <p class="bento__desc">Volatilitas tahunan turun dari 33,50% (1990-an) menjadi 16,52% (2010-an) — sekitar 51% lebih stabil dibanding tiga dekade sebelumnya.</p>
         </div>
       </div>
 
-      <p class="bento-note">Semua angka di atas didapat langsung dari hasil "bertanya" ke data lewat SQL — bukan diambil dari artikel atau sumber luar.</p>
+      <p class="bento-note">Semua angka di atas didapat langsung dari hasil "bertanya" ke data lewat SQL murni — bukan diambil dari artikel, uji statistik terpisah, atau sumber luar.</p>
     </div>
   </section>
 
   <!-- ============ DEEP DIVE ============ -->
-  <section class="section section--alt">
+  <section class="section">
     <div class="container">
     <div class="split">
       <div class="split__label">
       <p class="section-eyebrow">Cerita di Balik Angka</p>
-      <h2 class="section-title">6 temuan paling menarik</h2>
+      <h2 class="section-title">4 temuan tambahan</h2>
+      <p class="section-lead">Di luar 5 pertanyaan riset utama, beberapa query lain menghasilkan temuan menarik yang sayang dilewatkan.</p>
       </div>
       <div class="split__content">
 
       <!-- Finding 1 -->
-      <article class="finding">
-        <h3 class="finding__q">Bagaimana pertumbuhan IHSG setiap tahunnya?</h3>
-        <p class="body-text">Dengan meringkas data harian jadi rata-rata per tahun, terlihat harga IHSG naik dari 473,67 (tahun 1995) menjadi 7.163,22 (2026, data masih berjalan). Aktivitas jual-beli sahamnya naik jauh lebih drastis lagi: dari 71 juta lembar saham (1995) menjadi 63 miliar lembar (2025) — lebih dari 800 kali lipat lebih ramai.</p>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr><th>Tahun</th><th>Rata-rata Harga</th><th>Peringkat</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>2025</td><td>7.449,72</td><td>#1 tertinggi</td></tr>
-              <tr><td>2024</td><td>7.311,51</td><td>#2</td></tr>
-              <tr><td>2001</td><td>404,42</td><td>#32 (paling rendah)</td></tr>
-              <tr><td>1998</td><td>416,81</td><td>#31</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="callout callout--insight">
-          <strong>Temuan menarik:</strong> Tahun dengan rata-rata harga paling rendah ternyata <strong>bukan 1998</strong> (tahun krisis moneter yang paling dikenal orang), melainkan <strong>2001</strong> — sesuatu yang baru ketahuan setelah datanya benar-benar diperiksa, bukan asumsi dari cerita umum.
-        </div>
-      </article>
-
-      <!-- Finding 2 -->
-      <article class="finding">
-        <h3 class="finding__q">Tahun mana yang paling bikin "kaget" — naik atau turun drastis dari tahun sebelumnya?</h3>
-        <p class="body-text">Rata-rata harga tiap tahun dibandingkan dengan tahun sebelumnya, untuk melihat tahun mana yang perubahannya paling mencolok — baik ke arah naik maupun turun.</p>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr><th>Tahun</th><th>Perubahan dari Tahun Sebelumnya</th><th>Konteks</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>2010</td><td>+1.074,88</td><td>Lonjakan terbesar — pemulihan pasca krisis 2008</td></tr>
-              <tr><td>2021</td><td>+979,87</td><td>Rally pasca-pandemi COVID-19</td></tr>
-              <tr><td>2022</td><td>+730,60</td><td>Kelanjutan tren naik</td></tr>
-              <tr><td>2007</td><td>+746,05</td><td>Sebelum krisis 2008 mulai terasa</td></tr>
-              <tr><td>2017</td><td>+709,50</td><td>Pertumbuhan stabil</td></tr>
-              <tr><td>2020</td><td>-1.047,11</td><td>Penurunan terbesar — dampak crash COVID-19</td></tr>
-              <tr><td>1998</td><td>-189,84</td><td>Krisis moneter</td></tr>
-              <tr><td>2009</td><td>-121,96</td><td>Efek lanjutan krisis finansial global</td></tr>
-              <tr><td>2001</td><td>-102,93</td><td>Tahun dengan rata-rata harga terendah sepanjang data</td></tr>
-              <tr><td>2023</td><td>-102,49</td><td>Koreksi setelah rally 2022</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="callout callout--insight">
-          <strong>Temuan menarik:</strong> Lonjakan terbesar (2010, +1.074,88) justru muncul tepat setelah krisis 2008 — pola yang sama juga terlihat di 2021 setelah crash COVID-19. Pemulihan besar sering datang setelah penurunan besar, bukan kebetulan bersamaan dengan periode tenang.
-        </div>
-      </article>
-
-      <!-- Finding 3 -->
       <article class="finding">
         <h3 class="finding__q">Apa yang terjadi di sekitar hari-hari ekstrem itu?</h3>
         <p class="body-text">Bukan cuma lihat 1 hari doang, tapi juga 5 hari sebelum dan sesudahnya — supaya kelihatan apakah kejadian itu tiba-tiba atau memang bagian dari tren yang sedang berjalan.</p>
@@ -268,7 +356,7 @@
         </div>
       </article>
 
-      <!-- Finding 3 -->
+      <!-- Finding 2 -->
       <article class="finding">
         <h3 class="finding__q">Bisakah komputer "melihat" sinyal tren secara otomatis?</h3>
         <p class="body-text">Dihitung <span class="term">rata-rata bergerak (moving average)</span> — semacam rata-rata harga 20 hari terakhir dan 50 hari terakhir yang terus diperbarui tiap hari — lalu dicek otomatis kapan garis rata-rata jangka pendek (20 hari) melewati garis rata-rata jangka panjang (50 hari). Momen itu sering dianggap trader sebagai sinyal bahwa tren sedang berbalik naik <span class="term">("Golden Cross")</span>.</p>
@@ -277,7 +365,7 @@
         </div>
       </article>
 
-      <!-- Finding 4 -->
+      <!-- Finding 3 -->
       <article class="finding">
         <h3 class="finding__q">Kapan hari terbaik &amp; terburuk sepanjang sejarah IHSG?</h3>
         <p class="body-text">Dihitung perubahan harga dari hari ke hari (dalam persen), lalu diurutkan untuk menemukan 10 hari dengan kenaikan dan penurunan paling ekstrem.</p>
@@ -298,7 +386,7 @@
         </div>
       </article>
 
-      <!-- Finding 5 -->
+      <!-- Finding 4 -->
       <article class="finding">
         <h3 class="finding__q">Apakah data ini bisa dipercaya?</h3>
         <p class="body-text">Sebelum sebuah data dipakai untuk analisis, penting dicek dulu apakah datanya masuk akal. Tiga pengecekan dilakukan: data yang aktivitasnya tercatat nol, data yang secara logika mustahil (misalnya harga tertinggi hari itu lebih rendah dari harga terendahnya), dan jeda tanggal yang tidak wajar.</p>
