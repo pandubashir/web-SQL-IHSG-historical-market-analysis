@@ -467,6 +467,41 @@ code {
   color: var(--text-secondary);
 }
 
+/* ============ FINDINGS CONTEXT BOX (New Addition) ============ */
+.findings-context-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  margin: 24px 0 36px 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+.findings-context-box p {
+  margin: 0 0 12px 0;
+}
+.findings-context-box p:last-child {
+  margin-bottom: 0;
+}
+.findings-context-sub {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-top: 16px !important;
+  margin-bottom: 8px !important;
+}
+.findings-context-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-muted);
+}
+.findings-context-list li {
+  margin-bottom: 6px;
+}
+.findings-context-list strong {
+  color: var(--text-primary);
+}
+
 /* ============ BENTO (key findings) ============ */
 .bento {
   display: grid;
@@ -498,6 +533,12 @@ code {
   color: var(--text-primary);
 }
 .bento__label .term { display: block; margin-top: 2px; }
+.bento__desc-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: -4px 0 2px 0;
+}
 .bento__desc {
   font-size: 0.88rem;
   color: var(--text-muted);
