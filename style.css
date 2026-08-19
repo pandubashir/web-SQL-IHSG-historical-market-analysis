@@ -243,6 +243,23 @@ code {
   color: var(--text-muted);
 }
 
+.stat-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.4;
+}
+.hero__stats-note {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.hero__stats-note a {
+  color: var(--violet-2);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* ============ SPLIT LAYOUT (label + content, fills width) ============ */
 .split {
   display: grid;
