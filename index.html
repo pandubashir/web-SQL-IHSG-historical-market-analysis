@@ -445,22 +445,22 @@
       <p class="section-lead">Lima temuan di atas bukan sekadar angka statistik - masing-masing punya implikasi konkret untuk bagaimana query semacam ini bisa dipakai di sistem nyata.</p>
       </div>
       <div class="split__content">
-      <ol class="numbered-list numbered-list--big">
+            <ol class="numbered-list numbered-list--big">
+        <li>
+          <strong>Manfaatkan cumulative growth 13,26x sebagai justifikasi horizon investasi jangka panjang.</strong>
+          Pertumbuhan +1.226% (13,26x) sejak 1995 hanya terealisasi lewat holding period puluhan tahun, bukan trading jangka pendek. Logika cumulative return berbasis window function ini relevan untuk membangun narasi/justifikasi strategi <em>dollar-cost averaging</em> atau buy-and-hold dengan horizon minimum 10 tahun, dibanding strategi timing pasar jangka pendek.
+        </li>
+        <li>
+          <strong>Ketimpangan pertumbuhan antar tahun/dekade jadi dasar untuk tidak menyamaratakan ekspektasi return.</strong>
+          Data menunjukkan lonjakan dan penurunan tahunan terbesar sama-sama muncul tepat setelah krisis besar (2010 pasca 2008, 2020 saat COVID-19) - artinya return historis tidak terdistribusi merata di tiap periode. Query rata-rata Close per tahun ini bisa dipakai untuk membangun model ekspektasi return yang disesuaikan dengan fase siklus pasar, bukan angka rata-rata jangka panjang yang flat.
+        </li>
         <li>
           <strong>Bangun sistem monitoring drawdown berbasis running peak, bukan cuma cek harga harian.</strong>
-          Drawdown terdalam (-65,33%) dan lama pemulihan (1.936 hari) menunjukkan bahwa krisis besar tidak selesai dalam hitungan bulan. Logika <code>MAX() OVER (ROWS UNBOUNDED PRECEDING)</code> yang dipakai di analisis ini bisa langsung diadaptasi jadi query real-time untuk mendeteksi kapan portofolio sedang berada di titik drawdown terdalamnya - berguna sebagai trigger otomatis untuk tinjauan risiko, bukan cuma laporan bulanan.
+          Drawdown terdalam (-65,33%) menunjukkan risiko downside yang jauh lebih besar dari persepsi umum. Logika <code>MAX() OVER (ROWS UNBOUNDED PRECEDING)</code> yang dipakai di analisis ini bisa langsung diadaptasi jadi query real-time untuk mendeteksi kapan portofolio sedang berada di titik drawdown terdalamnya - berguna sebagai trigger otomatis untuk tinjauan risiko, bukan cuma laporan bulanan.
         </li>
         <li>
-          <strong>Volatilitas per dekade bisa jadi dasar segmentasi rolling risk window, bukan angka statis.</strong>
-          Penurunan volatilitas dari 33,50% (1990-an) ke 16,52% (2010-an), lalu naik lagi ke 18,47% di 2020-an, menunjukkan bahwa volatilitas historis itu bergerak per periode, bukan konstan. Query <code>STDDEV()</code> per dekade ini bisa diubah jadi rolling window (per 3-5 tahun) untuk risk model yang lebih adaptif terhadap kondisi pasar terkini, dibanding memakai satu angka volatilitas jangka panjang sebagai asumsi tetap.
-        </li>
-        <li>
-          <strong>Deteksi Golden Cross bisa langsung diintegrasikan sebagai alert otomatis di database, tanpa tools tambahan.</strong>
-          Query moving average (MA20/MA50) yang mendeteksi Golden Cross di akhir Juli 2026 membuktikan bahwa sinyal teknikal semacam ini bisa dihitung langsung dari SQL - artinya sebuah sistem trigger/notifikasi bisa dibangun murni di level database (misalnya lewat scheduled query atau database trigger), tanpa perlu software analisis pasar terpisah.
-        </li>
-        <li>
-          <strong>Korelasi volume-pergerakan harga yang lemah (-0,0183) berarti volume tidak bisa dipakai sebagai proxy volatilitas.</strong>
-          Ini penting untuk desain dashboard atau model risiko - kalau volume dijadikan indikator utama untuk mendeteksi hari-hari bergejolak, hasilnya akan menyesatkan. Volume sebaiknya tetap dipakai sebagai metrik likuiditas terpisah, bukan sinyal pergerakan harga.
+          <strong>Siapkan risk buffer berbasis lama pemulihan, bukan cuma besaran drawdown.</strong>
+          Recovery terlama mencapai 1.936 hari (~5,3 tahun) - artinya drawdown besar berpotensi mengunci modal dalam waktu sangat lama. Implikasinya, alokasi cash buffer atau instrumen non-korelasi perlu dihitung berdasarkan skenario recovery period sepanjang itu, bukan hanya berdasarkan besaran kerugian maksimal yang mungkin terjadi.
         </li>
         <li>
           <strong>Struktur data quality check (VIEW <code>ihsg_clean</code>) ini bisa jadi template validasi untuk pipeline data harga lain.</strong>
