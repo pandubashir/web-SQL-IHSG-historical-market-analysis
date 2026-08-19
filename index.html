@@ -264,7 +264,7 @@
           </table>
         </div>
         <div class="callout callout--insight">
-          <strong>Temuan menarik:</strong> Tahun dengan rata-rata harga paling rendah ternyata <strong>bukan 1998</strong> (tahun krisis moneter yang paling dikenal orang), melainkan <strong>2001</strong>. Lonjakan tahunan terbesar (2010) dan penurunan tahunan terbesar (2020) sama-sama muncul tepat setelah krisis besar (2008 dan awal COVID-19) - pola yang sama, arah berlawanan.
+          <strong>Insight:</strong> Tahun dengan rata-rata harga paling rendah ternyata <strong>bukan 1998</strong> (tahun krisis moneter yang paling dikenal orang), melainkan <strong>2001</strong>. Lonjakan tahunan terbesar (2010) dan penurunan tahunan terbesar (2020) sama-sama muncul tepat setelah krisis besar (2008 dan awal COVID-19) - pola yang sama, arah berlawanan.
         </div>
       </article>
 
@@ -288,7 +288,7 @@
           </table>
         </div>
         <div class="callout callout--insight">
-          <strong>Temuan menarik:</strong> Butuh lebih dari 5 tahun bagi IHSG untuk kembali ke level sebelum krisis 1997–1998 - jauh lebih lama dari drop-nya sendiri, yang menegaskan bahwa krisis moneter itu bukan cuma penurunan tajam sesaat, tapi luka yang butuh waktu sangat panjang untuk pulih.
+          <strong>Insight:</strong> Butuh lebih dari 5 tahun bagi IHSG untuk kembali ke level sebelum krisis 1997–1998 - jauh lebih lama dari drop-nya sendiri, yang menegaskan bahwa krisis moneter itu bukan cuma penurunan tajam sesaat, tapi luka yang butuh waktu sangat panjang untuk pulih.
         </div>
       </article>
 
@@ -311,7 +311,7 @@
           </table>
         </div>
         <div class="callout callout--insight">
-          <strong>Temuan menarik:</strong> Volatilitas menurun tajam dari 1990-an ke 2010-an, lalu naik lagi sedikit di 2020-an - kemungkinan efek COVID-19 dan gejolak pasar global.
+          <strong>Insight:</strong> Volatilitas menurun tajam dari 1990-an ke 2010-an, lalu naik lagi sedikit di 2020-an - kemungkinan efek COVID-19 dan gejolak pasar global.
         </div>
       </article>
 
@@ -332,7 +332,7 @@
           </table>
         </div>
         <div class="callout callout--insight">
-          <strong>Temuan menarik:</strong> Desember konsisten jadi bulan dengan rata-rata return harian tertinggi, mengindikasikan pola rally akhir tahun - sementara Agustus jadi satu-satunya bulan dengan rata-rata negatif.
+          <strong>Insight:</strong> Desember konsisten jadi bulan dengan rata-rata return harian tertinggi, mengindikasikan pola rally akhir tahun - sementara Agustus jadi satu-satunya bulan dengan rata-rata negatif.
         </div>
       </article>
 
@@ -352,7 +352,7 @@
           </table>
         </div>
         <div class="callout callout--insight">
-          <strong>Temuan menarik:</strong> Angka -0,0183 sangat lemah, mendekati nol - artinya volume transaksi <strong>tidak berkaitan secara berarti</strong> dengan seberapa besar harga bergerak hari itu. Hari dengan transaksi ramai belum tentu hari dengan pergerakan harga yang besar, begitu juga sebaliknya.
+          <strong>Insight:</strong> Angka -0,0183 sangat lemah, mendekati nol - artinya volume transaksi <strong>tidak berkaitan secara berarti</strong> dengan seberapa besar harga bergerak hari itu. Hari dengan transaksi ramai belum tentu hari dengan pergerakan harga yang besar, begitu juga sebaliknya.
         </div>
       </article>
 
@@ -378,7 +378,7 @@
         <p class="term">Dijawab lewat query SQL: "JOIN Market Events dengan Rentang ±5 Hari" (menggabungkan tabel <code>market_events</code> dengan <code>ihsg_daily</code> untuk melihat harga 5 hari sebelum sampai 5 hari sesudah tiap event penting).</p>
         <p class="body-text">Bukan cuma lihat 1 hari doang, tapi juga 5 hari sebelum dan sesudahnya - supaya kelihatan apakah kejadian itu tiba-tiba atau memang bagian dari tren yang sedang berjalan.</p>
         <div class="callout callout--insight">
-          <strong>Temuan menarik:</strong> Titik terendah 21 September 1998 bukan kejadian sesaat - data menunjukkan IHSG langsung mulai naik lagi cuma 2 hari setelahnya, artinya itu memang "titik dasar" sebelum harga pulih. Sebaliknya, hari terburuk (8 Januari 1998) itu bukan kejutan tiba-tiba, melainkan puncak dari tren turun yang sudah berlangsung beberapa hari sebelumnya.
+          <strong>Insight:</strong> Titik terendah 21 September 1998 bukan kejadian sesaat - data menunjukkan IHSG langsung mulai naik lagi cuma 2 hari setelahnya, artinya itu memang "titik dasar" sebelum harga pulih. Sebaliknya, hari terburuk (8 Januari 1998) itu bukan kejutan tiba-tiba, melainkan puncak dari tren turun yang sudah berlangsung beberapa hari sebelumnya.
         </div>
       </article>
 
@@ -388,7 +388,7 @@
         <p class="term">Dijawab lewat query SQL: "Moving Average 20 & 50 Hari" dan "Deteksi Golden Cross" (menghitung rata-rata bergerak berbasis window function, lalu mencari titik saat garis MA20 memotong ke atas garis MA50).</p>
         <p class="body-text">Dihitung <span class="term">rata-rata bergerak (moving average)</span> - semacam rata-rata harga 20 hari terakhir dan 50 hari terakhir yang terus diperbarui tiap hari - lalu dicek otomatis kapan garis rata-rata jangka pendek (20 hari) melewati garis rata-rata jangka panjang (50 hari). Momen itu sering dianggap trader sebagai sinyal bahwa tren sedang berbalik naik <span class="term">("Golden Cross")</span>.</p>
         <div class="callout callout--insight">
-          <strong>Temuan menarik:</strong> Sinyal seperti ini baru saja terbentuk di akhir Juli 2026 pada data terbaru - menunjukkan bahwa pola semacam ini bisa dideteksi otomatis langsung dari database, tanpa perlu software analisis saham tambahan.
+          <strong>Insight:</strong> Sinyal seperti ini baru saja terbentuk di akhir Juli 2026 pada data terbaru - menunjukkan bahwa pola semacam ini bisa dideteksi otomatis langsung dari database, tanpa perlu software analisis saham tambahan.
         </div>
       </article>
 
@@ -410,7 +410,7 @@
           </table>
         </div>
         <div class="callout callout--insight">
-          <strong>Temuan menarik:</strong> 7 dari 10 kenaikan harian terbesar terjadi di sekitar krisis 1997–1998. Ini pola yang cukup umum di pasar saham: setelah harga jatuh sangat dalam, biasanya diikuti lonjakan naik yang juga sangat tajam - bukan pas pasar lagi tenang-tenang saja.
+          <strong>Insight:</strong> 7 dari 10 kenaikan harian terbesar terjadi di sekitar krisis 1997–1998. Ini pola yang cukup umum di pasar saham: setelah harga jatuh sangat dalam, biasanya diikuti lonjakan naik yang juga sangat tajam - bukan pas pasar lagi tenang-tenang saja.
         </div>
       </article>
 
@@ -425,7 +425,7 @@
           <span class="stat-chip">41 jeda tanggal, semua = libur nasional</span>
         </div>
         <div class="callout callout--insight">
-          <strong>Temuan menarik:</strong> Datanya masuk akal secara logika, dan semua jeda tanggal bisa dijelaskan sepenuhnya oleh kalender libur Indonesia (Lebaran, Tahun Baru) - bukan tanda data yang hilang atau rusak.
+          <strong>Insight:</strong> Datanya masuk akal secara logika, dan semua jeda tanggal bisa dijelaskan sepenuhnya oleh kalender libur Indonesia (Lebaran, Tahun Baru) - bukan tanda data yang hilang atau rusak.
         </div>
       </article>
 
