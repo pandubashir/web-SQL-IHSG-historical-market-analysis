@@ -113,7 +113,7 @@
       </div>
 
       <p class="body-text">
-        Data mentah harga harian IHSG (format file CSV) dimasukkan ke sebuah tabel database bernama <code>ihsg_daily</code>. Ada juga satu tabel kecil kedua, <code>market_events</code>, isinya empat momen paling ekstrem sepanjang sejarah data (kenaikan/penurunan harian terbesar, harga tertinggi/terendah) - <strong>semuanya ditemukan lewat query ke data itu sendiri</strong>, bukan tanggal yang diketik dari hafalan atau internet, supaya bisa sepenuhnya dipertanggungjawabkan.
+        Data mentah dari Excel di-convert ke CSV lalu di-import ke PostgreSQL” dimasukkan ke sebuah tabel database bernama <code>ihsg_daily</code>. Ada juga satu tabel kecil kedua, <code>market_events</code>, isinya empat momen paling ekstrem sepanjang sejarah data (kenaikan/penurunan harian terbesar, harga tertinggi/terendah) - <strong>semuanya ditemukan lewat query ke data itu sendiri</strong>, bukan tanggal yang diketik dari hafalan atau internet, supaya bisa sepenuhnya dipertanggungjawabkan.
       </p>
 
       <div class="table-wrap">
@@ -134,6 +134,16 @@
 
       <div class="callout">
         <strong>Seberapa bersih datanya?</strong> Ditemukan 109 baris (1,4% dari total) yang <code>volume</code>-nya tercatat 0, kebanyakan dari tahun 1995 - kemungkinan besar karena pencatatan jumlah transaksi belum konsisten di masa awal bursa Indonesia. Tidak ditemukan satu pun baris yang datanya "mustahil" secara logika (misalnya harga tertinggi hari itu lebih rendah dari harga terendahnya) - jadi data ini bisa dipercaya untuk dianalisis.
+      </div>
+
+      <div class="findings-context-box">
+        <p class="findings-context-sub" style="margin-top:0 !important;">Data Validation &amp; Cleaning (<code>VIEW ihsg_clean</code>)</p>
+        <p>Sebelum analisis dilakukan, data melewati proses validasi otomatis untuk memastikan kualitasnya:</p>
+        <ul class="findings-context-list">
+          <li><strong>0 Data Mustahil:</strong> Tidak ada anomali logika harga (High &lt; Low).</li>
+          <li><strong>109 Baris Volume Nol (1,4%):</strong> Terdapat hari tanpa aktivitas transaksi pasar.</li>
+          <li><strong>41 Jeda Tanggal:</strong> Seluruh gap tanggal terverifikasi sebagai kalender libur nasional, bukan data hilang (missing data).</li>
+        </ul>
       </div>
       </div>
     </div>
@@ -161,7 +171,7 @@
         </div>
         <div class="flow__step">
           <span class="flow__num">Level 3 - JOIN, Subquery, CTE</span>
-          <p>Menggabungkan tabel harga harian dengan tabel event pasar penting, plus <span class="term">subquery (query di dalam query)</span> dan <span class="term">CTE (Common Table Expression, cara menyusun query bertahap yang lebih rapi)</span> untuk melihat konteks di sekitar tanggal-tanggal penting. <span class="term">Catatan: teknik ini dipakai pada tahap Deep Dive / Temuan Tambahan - misalnya penggabungan data market events - bukan pada 5 Pertanyaan Riset utama.</span></p>
+          <p>Menggabungkan tabel harga harian dengan tabel event pasar penting, plus <span class="term">subquery (query di dalam query)</span> dan <span class="term">CTE (Common Table Expression, cara menyusun query bertahap yang lebih rapi)</span> untuk melihat konteks di sekitar tanggal-tanggal penting - salah satunya dipakai untuk menggabungkan data market events pada eksplorasi lanjutan di luar 5 Pertanyaan Riset utama.</p>
         </div>
         <div class="flow__step">
           <span class="flow__num">Level 4 - Window Functions</span>
@@ -169,7 +179,7 @@
         </div>
         <div class="flow__step">
           <span class="flow__num">Level 5 - Data Quality & Views</span>
-          <p>Memvalidasi kualitas data (baris aneh, gap tanggal, harga tidak masuk akal), lalu membungkus query yang sering dipakai ulang ke dalam <span class="term">VIEW (tabel virtual yang menyimpan definisi query, bukan data itu sendiri)</span>. <span class="term">Catatan: validasi kualitas data dan pembuatan view ini termasuk dalam tahap Deep Dive / Temuan Tambahan, bukan pada 5 Pertanyaan Riset utama.</span></p>
+          <p>Memvalidasi kualitas data (baris aneh, gap tanggal, harga tidak masuk akal), lalu membungkus query yang sering dipakai ulang ke dalam <span class="term">VIEW (tabel virtual yang menyimpan definisi query, bukan data itu sendiri)</span> - hasil validasinya ditampilkan di bagian Data Preparation sebagai <code>VIEW ihsg_clean</code>.</p>
         </div>
       </div>
 
@@ -361,81 +371,7 @@
     </div>
   </section>
 
-  <!-- ============ DEEP DIVE ============ -->
-  <section class="section">
-    <div class="container">
-    <div class="split">
-      <div class="split__label">
-      <p class="section-eyebrow">Cerita di Balik Angka</p>
-      <h2 class="section-title">4 temuan tambahan</h2>
-      <p class="section-lead">Di luar 5 pertanyaan riset utama, beberapa query lain menghasilkan temuan menarik yang sayang dilewatkan.</p>
-      </div>
-      <div class="split__content">
-
-      <!-- Finding 1 -->
-      <article class="finding">
-        <h3 class="finding__q">Apa yang terjadi di sekitar hari-hari ekstrem itu?</h3>
-        <p class="term">Dijawab lewat query SQL: "JOIN Market Events dengan Rentang ±5 Hari" (menggabungkan tabel <code>market_events</code> dengan <code>ihsg_daily</code> untuk melihat harga 5 hari sebelum sampai 5 hari sesudah tiap event penting).</p>
-        <p class="body-text">Bukan cuma lihat 1 hari doang, tapi juga 5 hari sebelum dan sesudahnya - supaya kelihatan apakah kejadian itu tiba-tiba atau memang bagian dari tren yang sedang berjalan.</p>
-        <div class="callout callout--insight">
-          <strong>Insight:</strong> Titik terendah 21 September 1998 bukan kejadian sesaat - data menunjukkan IHSG langsung mulai naik lagi cuma 2 hari setelahnya, artinya itu memang "titik dasar" sebelum harga pulih. Sebaliknya, hari terburuk (8 Januari 1998) itu bukan kejutan tiba-tiba, melainkan puncak dari tren turun yang sudah berlangsung beberapa hari sebelumnya.
-        </div>
-      </article>
-
-      <!-- Finding 2 -->
-      <article class="finding">
-        <h3 class="finding__q">Bisakah komputer "melihat" sinyal tren secara otomatis?</h3>
-        <p class="term">Dijawab lewat query SQL: "Moving Average 20 & 50 Hari" dan "Deteksi Golden Cross" (menghitung rata-rata bergerak berbasis window function, lalu mencari titik saat garis MA20 memotong ke atas garis MA50).</p>
-        <p class="body-text">Dihitung <span class="term">rata-rata bergerak (moving average)</span> - semacam rata-rata harga 20 hari terakhir dan 50 hari terakhir yang terus diperbarui tiap hari - lalu dicek otomatis kapan garis rata-rata jangka pendek (20 hari) melewati garis rata-rata jangka panjang (50 hari). Momen itu sering dianggap trader sebagai sinyal bahwa tren sedang berbalik naik <span class="term">("Golden Cross")</span>.</p>
-        <div class="callout callout--insight">
-          <strong>Insight:</strong> Sinyal seperti ini baru saja terbentuk di akhir Juli 2026 pada data terbaru - menunjukkan bahwa pola semacam ini bisa dideteksi otomatis langsung dari database, tanpa perlu software analisis saham tambahan.
-        </div>
-      </article>
-
-      <!-- Finding 3 -->
-      <article class="finding">
-        <h3 class="finding__q">Kapan hari terbaik &amp; terburuk sepanjang sejarah IHSG?</h3>
-        <p class="term">Dijawab lewat query SQL: "10 Daily Return Tertinggi" dan "10 Daily Return Terendah" (mengurutkan <code>daily_return_pct</code> hasil window function <code>LAG()</code> secara menurun dan menaik, masing-masing diambil 10 teratas).</p>
-        <p class="body-text">Dihitung perubahan harga dari hari ke hari (dalam persen), lalu diurutkan untuk menemukan 10 hari dengan kenaikan dan penurunan paling ekstrem.</p>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr><th>Tanggal</th><th>Perubahan Harga</th><th>Konteks</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>2 Feb 1998</td><td>+14,03%</td><td>Kenaikan harian terbesar sepanjang sejarah</td></tr>
-              <tr><td>8 Jan 1998</td><td>-11,95%</td><td>Penurunan harian terbesar sepanjang sejarah</td></tr>
-              <tr><td>26 Mar 2020</td><td>+10,19%</td><td>Pemulihan tajam setelah crash COVID-19</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="callout callout--insight">
-          <strong>Insight:</strong> 7 dari 10 kenaikan harian terbesar terjadi di sekitar krisis 1997–1998. Ini pola yang cukup umum di pasar saham: setelah harga jatuh sangat dalam, biasanya diikuti lonjakan naik yang juga sangat tajam - bukan pas pasar lagi tenang-tenang saja.
-        </div>
-      </article>
-
-      <!-- Finding 4 -->
-      <article class="finding">
-        <h3 class="finding__q">Apakah data ini bisa dipercaya?</h3>
-        <p class="term">Dijawab lewat query SQL: pengecekan "Volume = 0", "Gap Tanggal Trading", dan "High &lt; Low" (anomali logika harga), lalu dibungkus jadi <code>VIEW ihsg_clean</code> sebagai versi data yang sudah tervalidasi.</p>
-        <p class="body-text">Sebelum sebuah data dipakai untuk analisis, penting dicek dulu apakah datanya masuk akal. Tiga pengecekan dilakukan: data yang aktivitasnya tercatat nol, data yang secara logika mustahil (misalnya harga tertinggi hari itu lebih rendah dari harga terendahnya), dan jeda tanggal yang tidak wajar.</p>
-        <div class="stat-row">
-          <span class="stat-chip stat-chip--yes">0 data yang mustahil secara logika</span>
-          <span class="stat-chip">109 baris aktivitas tercatat nol (1,4%)</span>
-          <span class="stat-chip">41 jeda tanggal, semua = libur nasional</span>
-        </div>
-        <div class="callout callout--insight">
-          <strong>Insight:</strong> Datanya masuk akal secara logika, dan semua jeda tanggal bisa dijelaskan sepenuhnya oleh kalender libur Indonesia (Lebaran, Tahun Baru) - bukan tanda data yang hilang atau rusak.
-        </div>
-      </article>
-
-      </div>
-    </div>
-    </div>
-  </section>
-
-
-<!-- ============ BUSINESS INSIGHTS ============ -->
+  <!-- ============ BUSINESS INSIGHTS ============ -->
   <section class="section section--alt">
     <div class="container">
     <div class="split">
@@ -447,24 +383,24 @@
       <div class="split__content">
             <ol class="numbered-list numbered-list--big">
         <li>
-          <strong>Manfaatkan cumulative growth 13,26x sebagai justifikasi horizon investasi jangka panjang.</strong>
-          Pertumbuhan +1.226% (13,26x) sejak 1995 hanya terealisasi lewat holding period puluhan tahun, bukan trading jangka pendek. Logika cumulative return berbasis window function ini relevan untuk membangun narasi/justifikasi strategi <em>dollar-cost averaging</em> atau buy-and-hold dengan horizon minimum 10 tahun, dibanding strategi timing pasar jangka pendek.
+          <strong>Adopsi strategi investasi jangka panjang (buy and hold) berdasarkan cumulative growth.</strong>
+          Mengingat pertumbuhan kumulatif IHSG mencapai 13,26x (+1.226%) sejak 1995, imbal hasil optimal hanya bisa terealisasi lewat holding period puluhan tahun, bukan trading jangka pendek.
         </li>
         <li>
-          <strong>Ketimpangan pertumbuhan antar tahun/dekade jadi dasar untuk tidak menyamaratakan ekspektasi return.</strong>
-          Data menunjukkan lonjakan dan penurunan tahunan terbesar sama-sama muncul tepat setelah krisis besar (2010 pasca 2008, 2020 saat COVID-19) - artinya return historis tidak terdistribusi merata di tiap periode. Query rata-rata Close per tahun ini bisa dipakai untuk membangun model ekspektasi return yang disesuaikan dengan fase siklus pasar, bukan angka rata-rata jangka panjang yang flat.
+          <strong>Gunakan pendekatan dynamic forecasting dibanding rata-rata statis.</strong>
+          Karena pertumbuhan historis terbukti tidak terdistribusi merata dan didominasi oleh lonjakan pasca-krisis (seperti 2010 dan 2020), ekspektasi return wajib disesuaikan dengan fase siklus pasar.
         </li>
         <li>
-          <strong>Bangun sistem monitoring drawdown berbasis running peak, bukan cuma cek harga harian.</strong>
-          Drawdown terdalam (-65,33%) menunjukkan risiko downside yang jauh lebih besar dari persepsi umum. Logika <code>MAX() OVER (ROWS UNBOUNDED PRECEDING)</code> yang dipakai di analisis ini bisa langsung diadaptasi jadi query real-time untuk mendeteksi kapan portofolio sedang berada di titik drawdown terdalamnya - berguna sebagai trigger otomatis untuk tinjauan risiko, bukan cuma laporan bulanan.
+          <strong>Terapkan sistem monitoring drawdown berbasis running peak secara real-time.</strong>
+          Karena drawdown dapat mencapai -65,33%, kalkulasi running peak (<code>MAX() OVER (ROWS UNBOUNDED PRECEDING)</code>) perlu dijadikan trigger alert otomatis untuk mengantisipasi penurunan tajam portofolio.
         </li>
         <li>
-          <strong>Siapkan risk buffer berbasis lama pemulihan, bukan cuma besaran drawdown.</strong>
-          Recovery terlama mencapai 1.936 hari (~5,3 tahun) - artinya drawdown besar berpotensi mengunci modal dalam waktu sangat lama. Implikasinya, alokasi cash buffer atau instrumen non-korelasi perlu dihitung berdasarkan skenario recovery period sepanjang itu, bukan hanya berdasarkan besaran kerugian maksimal yang mungkin terjadi.
+          <strong>Siapkan buffer likuiditas berbasis durasi pemulihan pasar (recovery period).</strong>
+          Mengingat pemulihan dari drawdown terdalam membutuhkan waktu hingga 1.936 hari (~5,3 tahun), alokasi dana darurat atau instrumen berisiko rendah perlu disesuaikan agar modal tidak terkunci dalam jangka panjang.
         </li>
         <li>
-          <strong>Struktur data quality check (VIEW <code>ihsg_clean</code>) ini bisa jadi template validasi untuk pipeline data harga lain.</strong>
-          Tiga pengecekan yang dipakai di sini (volume nol, anomali logika harga, gap tanggal) adalah pola validasi dasar yang reusable - bisa langsung diterapkan ke dataset harga saham/aset lain sebagai langkah pertama sebelum data dipakai untuk analisis lanjutan.
+          <strong>Gunakan logika validasi VIEW <code>ihsg_clean</code> sebagai standar pipeline data harga.</strong>
+          Pengecekan volume nol, anomali logika harga, dan gap tanggal pada <code>VIEW ihsg_clean</code> berfungsi sebagai pola validasi dasar (Data Quality framework) yang reusable untuk ingestion dataset aset lainnya.
         </li>
       </ol>
       </div>
