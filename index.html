@@ -254,29 +254,29 @@
       </div>
       <div class="split__content">
 
-      <!-- Q1 -->
-      <article class="finding">
-        <h3 class="finding__q">Q1 - Bagaimana pertumbuhan IHSG dari 1995–2026, dan tahun mana paling ekstrem naik/turun?</h3>
-        <p class="term">Dijawab lewat query SQL: "Rata-rata, Tertinggi, Terendah Close per Tahun" dan "Cumulative Return Sejak Awal Data" (menjumlahkan return harian sejak hari pertama data untuk melihat total pertumbuhan sampai hari terakhir).</p>
-        <p class="body-text">Data harian diringkas jadi rata-rata per tahun, lalu dibandingkan tahun demi tahun untuk melihat lonjakan dan penurunan paling mencolok.</p>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr><th>Metrik</th><th>Nilai <span class="term">(dalam poin indeks IHSG, kecuali disebutkan lain)</span></th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Cumulative return <span class="term">(total pertumbuhan sejak awal data)</span></td><td>+1.226% (13,26x lipat)</td></tr>
-              <tr><td>Rata-rata Close tertinggi</td><td>2025 (7.449,72 poin)</td></tr>
-              <tr><td>Rata-rata Close terendah</td><td>2001 (404,42 poin), lebih rendah dari 1998 (416,81 poin)</td></tr>
-              <tr><td>Lonjakan tahunan terbesar</td><td>2010 (+1.074,88 poin), pemulihan pasca krisis 2008</td></tr>
-              <tr><td>Penurunan tahunan terbesar</td><td>2020 (-1.047,11 poin), dampak COVID-19</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="callout callout--insight">
-          <strong>Insight:</strong> Tahun dengan rata-rata harga paling rendah ternyata <strong>bukan 1998</strong> (tahun krisis moneter yang paling dikenal orang), melainkan <strong>2001</strong>. Lonjakan tahunan terbesar (2010) dan penurunan tahunan terbesar (2020) sama-sama muncul tepat setelah krisis besar (2008 dan awal COVID-19) - pola yang sama, arah berlawanan.
-        </div>
-      </article>
+    <!-- Q1 -->
+<article class="finding">
+  <h3 class="finding__q">Q1 - Bagaimana pertumbuhan IHSG dari 1995–2026, dan tahun mana paling ekstrem naik/turun?</h3>
+  <p class="term">Dijawab lewat query SQL: "Rata-rata, Tertinggi, Terendah Close per Tahun" dan "Cumulative Return Sejak Awal Data" (dihitung dengan metode compounding - mengakumulasi return harian secara multiplikatif, bukan dijumlah biasa - untuk melihat total pertumbuhan sampai hari terakhir).</p>
+  <p class="body-text">Data harian diringkas jadi rata-rata per tahun, lalu dibandingkan tahun demi tahun untuk melihat lonjakan dan penurunan paling mencolok.</p>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>Metrik</th><th>Nilai <span class="term">(dalam poin indeks IHSG, kecuali disebutkan lain)</span></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Cumulative return <span class="term">(total pertumbuhan sejak awal data)</span></td><td>+1.226% (13,26x lipat)</td></tr>
+        <tr><td>Rata-rata Close tertinggi</td><td>2025 (7.449,72 poin)</td></tr>
+        <tr><td>Rata-rata Close terendah</td><td>2001 (404,42 poin), lebih rendah dari 1998 (416,81 poin)</td></tr>
+        <tr><td>Lonjakan tahunan terbesar</td><td>2010 (+1.074,88 poin), pemulihan pasca krisis 2008</td></tr>
+        <tr><td>Penurunan tahunan terbesar</td><td>2020 (-1.047,11 poin), dampak COVID-19</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout callout--insight">
+    <strong>Insight:</strong> Tahun dengan rata-rata harga tahunan paling rendah ternyata <strong>bukan 1998</strong> (tahun krisis moneter yang paling dikenal orang), melainkan <strong>2001</strong>. Titik terendah absolut IHSG memang tercatat di 1998 (saat krisis paling parah), tapi itu cuma menyentuh beberapa bulan terakhir tahun itu - sehingga kalau dirata-rata sepanjang tahun, angkanya masih terangkat lebih tinggi dari 2001, yang harganya konsisten rendah sepanjang tahun tanpa satu titik krisis tunggal yang dramatis. Lonjakan tahunan terbesar (2010) dan penurunan tahunan terbesar (2020) sama-sama muncul tepat setelah krisis besar (2008 dan awal COVID-19) - pola yang sama, arah berlawanan.
+  </div>
+</article>
 
       <!-- Q2 -->
       <article class="finding">
@@ -381,28 +381,28 @@
       <p class="section-lead">Lima temuan di atas bukan sekadar angka statistik - masing-masing punya implikasi konkret untuk bagaimana query semacam ini bisa dipakai di sistem nyata.</p>
       </div>
       <div class="split__content">
-            <ol class="numbered-list numbered-list--big">
-        <li>
-          <strong>Adopsi strategi investasi jangka panjang (buy and hold) berdasarkan cumulative growth.</strong>
-          Mengingat pertumbuhan kumulatif IHSG mencapai 13,26x (+1.226%) sejak 1995, imbal hasil optimal hanya bisa terealisasi lewat holding period puluhan tahun, bukan trading jangka pendek.
-        </li>
-        <li>
-          <strong>Gunakan pendekatan dynamic forecasting dibanding rata-rata statis.</strong>
-          Karena pertumbuhan historis terbukti tidak terdistribusi merata dan didominasi oleh lonjakan pasca-krisis (seperti 2010 dan 2020), ekspektasi return wajib disesuaikan dengan fase siklus pasar.
-        </li>
-        <li>
-          <strong>Terapkan sistem monitoring drawdown berbasis running peak secara real-time.</strong>
-          Karena drawdown dapat mencapai -65,33%, kalkulasi running peak (<code>MAX() OVER (ROWS UNBOUNDED PRECEDING)</code>) perlu dijadikan trigger alert otomatis untuk mengantisipasi penurunan tajam portofolio.
-        </li>
-        <li>
-          <strong>Siapkan buffer likuiditas berbasis durasi pemulihan pasar (recovery period).</strong>
-          Mengingat pemulihan dari drawdown terdalam membutuhkan waktu hingga 1.936 hari (~5,3 tahun), alokasi dana darurat atau instrumen berisiko rendah perlu disesuaikan agar modal tidak terkunci dalam jangka panjang.
-        </li>
-        <li>
-          <strong>Gunakan logika validasi VIEW <code>ihsg_clean</code> sebagai standar pipeline data harga.</strong>
-          Pengecekan volume nol, anomali logika harga, dan gap tanggal pada <code>VIEW ihsg_clean</code> berfungsi sebagai pola validasi dasar (Data Quality framework) yang reusable untuk ingestion dataset aset lainnya.
-        </li>
-      </ol>
+         <ol class="numbered-list numbered-list--big">
+  <li>
+    <strong>Cumulative growth 13,26x menunjukkan return IHSG baru terlihat signifikan dalam horizon panjang.</strong>
+    Pertumbuhan +1.226% (13,26x) sejak 1995 dihitung dengan metode log-return compounding (<code>EXP(SUM(LN(1 + daily_return)) OVER (ORDER BY trade_date)) - 1</code>), cara yang lebih akurat dibanding penjumlahan return biasa karena return harian bersifat multiplikatif. Angka ini menunjukkan bahwa pertumbuhan besar seperti ini baru terlihat jelas dalam holding period puluhan tahun - relevan sebagai data pendukung untuk strategi <em>dollar-cost averaging</em> atau buy-and-hold dengan horizon panjang, dibanding trading jangka pendek.
+  </li>
+  <li>
+    <strong>Ketimpangan pertumbuhan antar tahun menunjukkan return historis tidak bisa dipukul rata.</strong>
+    Data agregasi rata-rata close per tahun (<code>AVG(close_price) GROUP BY YEAR</code>) menunjukkan lonjakan dan penurunan tahunan terbesar sama-sama muncul tepat setelah krisis besar (2010 pasca 2008, 2020 saat COVID-19). Ini jadi dasar untuk tidak menyamaratakan ekspektasi return jangka panjang dengan performa tahun-tahun tertentu - ekspektasi return sebaiknya mempertimbangkan posisi siklus pasar saat itu, bukan cuma rata-rata historis.
+  </li>
+  <li>
+    <strong>Gunakan running peak untuk mengidentifikasi titik-titik drawdown terdalam.</strong>
+    Drawdown terdalam tercatat -65,33%, dihitung dengan membandingkan setiap harga penutupan terhadap titik tertinggi historisnya sampai hari itu (running peak), menggunakan <code>MAX() OVER (ORDER BY trade_date ROWS UNBOUNDED PRECEDING)</code>. Query ini membantu melihat seberapa dalam dan kapan penurunan terbesar terjadi - informasi dasar yang berguna sebelum menentukan level toleransi risiko portofolio.
+  </li>
+  <li>
+    <strong>Ukur lama pemulihan, bukan cuma kedalaman penurunan, untuk memahami risiko riil.</strong>
+    Recovery terlama tercatat 1.936 hari (~5,3 tahun) - dihitung dengan menyaring data setelah tanggal titik terendah drawdown, lalu mencari baris pertama di mana harga kembali menyamai atau melampaui level peak sebelum krisis. Angka ini menunjukkan bahwa drawdown besar bisa mengunci modal jauh lebih lama dari yang terlihat dari persentase kerugiannya saja - pertimbangan penting saat menghitung berapa lama dana perlu "tahan" sebelum kembali ke titik impas.
+  </li>
+  <li>
+    <strong>Insight di atas dihasilkan dari data yang sudah melalui proses pembersihan, bukan data mentah.</strong>
+    Sebelum dianalisis, data melalui pengecekan volume nol, anomali logika harga (<code>high_price &lt; low_price</code>), dan gap tanggal, lalu difilter lewat <code>VIEW ihsg_clean</code>. Artinya angka-angka 13,26x, -65,33%, dan 1.936 hari di atas dihitung dari data yang sudah divalidasi, bukan angka mentah yang berpotensi bias oleh baris cacat.
+  </li>
+</ol>
       </div>
     </div>
     </div>
