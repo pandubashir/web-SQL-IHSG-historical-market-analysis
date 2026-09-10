@@ -381,25 +381,25 @@
       <p class="section-lead">Lima temuan di atas bukan sekadar angka statistik - masing-masing punya implikasi konkret untuk bagaimana query semacam ini bisa dipakai di sistem nyata.</p>
       </div>
       <div class="split__content">
-       <ol class="numbered-list numbered-list--big">
+    <ol class="numbered-list numbered-list--big">
   <li>
     <strong>Adopsi strategi investasi jangka panjang (buy and hold) berdasarkan cumulative growth.</strong>
     Mengingat pertumbuhan kumulatif IHSG mencapai 13,26x (+1.226%) sejak 1995, imbal hasil optimal hanya bisa terealisasi lewat holding period puluhan tahun, bukan trading jangka pendek.
   </li>
   <li>
-    <strong>Gunakan pendekatan dynamic forecasting dibanding rata-rata statis.</strong>
-    Karena pertumbuhan historis terbukti tidak terdistribusi merata dan didominasi oleh lonjakan pasca-krisis (seperti 2010 dan 2020), ekspektasi return wajib disesuaikan dengan fase siklus pasar.
+    <strong>Sesuaikan ekspektasi return dengan fase siklus pasar, bukan rata-rata statis.</strong>
+    Karena pertumbuhan historis terbukti tidak terdistribusi merata dan didominasi oleh lonjakan pasca-krisis (seperti 2010 dan 2020), ekspektasi return wajib disesuaikan dengan fase siklus pasar yang sedang berjalan.
   </li>
   <li>
-    <strong>Jadikan logika running peak sebagai dasar sistem monitoring drawdown.</strong>
-    Query <code>MAX() OVER (ROWS UNBOUNDED PRECEDING)</code> yang dipakai untuk menghitung drawdown -65,33% pada data historis berpotensi diadaptasi ke pipeline monitoring berkala (misalnya harian/mingguan) sebagai early warning system, meski implementasinya di luar cakupan project ini.
+    <strong>Adaptasi logika running peak untuk monitoring drawdown berkelanjutan.</strong>
+    Karena drawdown dapat mencapai -65,33%, kalkulasi running peak (<code>MAX() OVER (ROWS UNBOUNDED PRECEDING)</code>) yang sudah terbukti pada data historis ini bisa dikembangkan lebih lanjut menjadi sistem alert otomatis untuk mengantisipasi penurunan tajam portofolio.
   </li>
   <li>
     <strong>Siapkan buffer likuiditas berbasis durasi pemulihan pasar (recovery period).</strong>
     Mengingat pemulihan dari drawdown terdalam membutuhkan waktu hingga 1.936 hari (~5,3 tahun), alokasi dana darurat atau instrumen berisiko rendah perlu disesuaikan agar modal tidak terkunci dalam jangka panjang.
   </li>
   <li>
-    <strong>Gunakan logika validasi VIEW ihsg_clean sebagai standar pipeline data harga.</strong>
+    <strong>Gunakan logika validasi VIEW <code>ihsg_clean</code> sebagai standar pipeline data harga.</strong>
     Pengecekan volume nol, anomali logika harga, dan gap tanggal pada <code>VIEW ihsg_clean</code> berfungsi sebagai pola validasi dasar (Data Quality framework) yang reusable untuk ingestion dataset aset lainnya.
   </li>
 </ol>
