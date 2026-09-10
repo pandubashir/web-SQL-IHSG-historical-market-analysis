@@ -381,26 +381,26 @@
       <p class="section-lead">Lima temuan di atas bukan sekadar angka statistik - masing-masing punya implikasi konkret untuk bagaimana query semacam ini bisa dipakai di sistem nyata.</p>
       </div>
       <div class="split__content">
-         <ol class="numbered-list numbered-list--big">
+       <ol class="numbered-list numbered-list--big">
   <li>
-    <strong>Cumulative growth 13,26x menunjukkan return IHSG baru terlihat signifikan dalam horizon panjang.</strong>
-    Pertumbuhan +1.226% (13,26x) sejak 1995 dihitung dengan metode log-return compounding (<code>EXP(SUM(LN(1 + daily_return)) OVER (ORDER BY trade_date)) - 1</code>), cara yang lebih akurat dibanding penjumlahan return biasa karena return harian bersifat multiplikatif. Angka ini menunjukkan bahwa pertumbuhan besar seperti ini baru terlihat jelas dalam holding period puluhan tahun - relevan sebagai data pendukung untuk strategi <em>dollar-cost averaging</em> atau buy-and-hold dengan horizon panjang, dibanding trading jangka pendek.
+    <strong>Adopsi strategi investasi jangka panjang (buy and hold) berdasarkan cumulative growth.</strong>
+    Mengingat pertumbuhan kumulatif IHSG mencapai 13,26x (+1.226%) sejak 1995, imbal hasil optimal hanya bisa terealisasi lewat holding period puluhan tahun, bukan trading jangka pendek.
   </li>
   <li>
-    <strong>Ketimpangan pertumbuhan antar tahun menunjukkan return historis tidak bisa dipukul rata.</strong>
-    Data agregasi rata-rata close per tahun (<code>AVG(close_price) GROUP BY YEAR</code>) menunjukkan lonjakan dan penurunan tahunan terbesar sama-sama muncul tepat setelah krisis besar (2010 pasca 2008, 2020 saat COVID-19). Ini jadi dasar untuk tidak menyamaratakan ekspektasi return jangka panjang dengan performa tahun-tahun tertentu - ekspektasi return sebaiknya mempertimbangkan posisi siklus pasar saat itu, bukan cuma rata-rata historis.
+    <strong>Gunakan pendekatan dynamic forecasting dibanding rata-rata statis.</strong>
+    Karena pertumbuhan historis terbukti tidak terdistribusi merata dan didominasi oleh lonjakan pasca-krisis (seperti 2010 dan 2020), ekspektasi return wajib disesuaikan dengan fase siklus pasar.
   </li>
   <li>
-    <strong>Gunakan running peak untuk mengidentifikasi titik-titik drawdown terdalam.</strong>
-    Drawdown terdalam tercatat -65,33%, dihitung dengan membandingkan setiap harga penutupan terhadap titik tertinggi historisnya sampai hari itu (running peak), menggunakan <code>MAX() OVER (ORDER BY trade_date ROWS UNBOUNDED PRECEDING)</code>. Query ini membantu melihat seberapa dalam dan kapan penurunan terbesar terjadi - informasi dasar yang berguna sebelum menentukan level toleransi risiko portofolio.
+    <strong>Jadikan logika running peak sebagai dasar sistem monitoring drawdown.</strong>
+    Query <code>MAX() OVER (ROWS UNBOUNDED PRECEDING)</code> yang dipakai untuk menghitung drawdown -65,33% pada data historis berpotensi diadaptasi ke pipeline monitoring berkala (misalnya harian/mingguan) sebagai early warning system, meski implementasinya di luar cakupan project ini.
   </li>
   <li>
-    <strong>Ukur lama pemulihan, bukan cuma kedalaman penurunan, untuk memahami risiko riil.</strong>
-    Recovery terlama tercatat 1.936 hari (~5,3 tahun) - dihitung dengan menyaring data setelah tanggal titik terendah drawdown, lalu mencari baris pertama di mana harga kembali menyamai atau melampaui level peak sebelum krisis. Angka ini menunjukkan bahwa drawdown besar bisa mengunci modal jauh lebih lama dari yang terlihat dari persentase kerugiannya saja - pertimbangan penting saat menghitung berapa lama dana perlu "tahan" sebelum kembali ke titik impas.
+    <strong>Siapkan buffer likuiditas berbasis durasi pemulihan pasar (recovery period).</strong>
+    Mengingat pemulihan dari drawdown terdalam membutuhkan waktu hingga 1.936 hari (~5,3 tahun), alokasi dana darurat atau instrumen berisiko rendah perlu disesuaikan agar modal tidak terkunci dalam jangka panjang.
   </li>
   <li>
-    <strong>Insight di atas dihasilkan dari data yang sudah melalui proses pembersihan, bukan data mentah.</strong>
-    Sebelum dianalisis, data melalui pengecekan volume nol, anomali logika harga (<code>high_price &lt; low_price</code>), dan gap tanggal, lalu difilter lewat <code>VIEW ihsg_clean</code>. Artinya angka-angka 13,26x, -65,33%, dan 1.936 hari di atas dihitung dari data yang sudah divalidasi, bukan angka mentah yang berpotensi bias oleh baris cacat.
+    <strong>Gunakan logika validasi VIEW ihsg_clean sebagai standar pipeline data harga.</strong>
+    Pengecekan volume nol, anomali logika harga, dan gap tanggal pada <code>VIEW ihsg_clean</code> berfungsi sebagai pola validasi dasar (Data Quality framework) yang reusable untuk ingestion dataset aset lainnya.
   </li>
 </ol>
       </div>
