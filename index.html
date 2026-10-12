@@ -133,7 +133,7 @@
       </div>
 
       <div class="callout">
-        <strong>Seberapa bersih datanya?</strong> Ditemukan 109 baris (1,4% dari total) yang <code>volume</code>-nya tercatat 0, kebanyakan dari tahun 1995 - kemungkinan besar karena pencatatan jumlah transaksi belum konsisten di masa awal bursa Indonesia. Tidak ditemukan satu pun baris yang datanya "mustahil" secara logika (misalnya harga tertinggi hari itu lebih rendah dari harga terendahnya) - jadi data ini bisa dipercaya untuk dianalisis.
+        <strong>Seberapa bersih datanya?</strong> Ditemukan 109 baris (1,4% dari total) yang <code>volume</code>-nya tercatat 0. Sebanyak 100 baris berasal dari tahun 1995 - kemungkinan besar karena pencatatan jumlah transaksi belum konsisten di masa awal bursa Indonesia - sedangkan 9 baris lainnya tersebar di tahun 2017–2026. Tidak ditemukan satu pun baris yang datanya "mustahil" secara logika (misalnya harga tertinggi hari itu lebih rendah dari harga terendahnya) - jadi data ini bisa dipercaya untuk dianalisis.
       </div>
 
       <div class="findings-context-box">
@@ -141,7 +141,7 @@
         <p>Sebelum analisis dilakukan, data melewati proses validasi otomatis untuk memastikan kualitasnya:</p>
         <ul class="findings-context-list">
           <li><strong>0 Data Mustahil:</strong> Tidak ada anomali logika harga (High &lt; Low).</li>
-          <li><strong>109 Baris Volume Nol (1,4%):</strong> Terdapat hari tanpa aktivitas transaksi pasar.</li>
+          <li><strong>109 Baris Volume Nol (1,4%):</strong> Terdapat hari tanpa aktivitas transaksi tercatat, 100 di antaranya di tahun 1995.</li>
           <li><strong>41 Jeda Tanggal:</strong> Seluruh gap tanggal terverifikasi sebagai kalender libur nasional, bukan data hilang (missing data).</li>
         </ul>
       </div>
@@ -337,12 +337,13 @@
             </thead>
             <tbody>
               <tr><td>Desember</td><td>+0,2015% (tertinggi)</td></tr>
-              <tr><td>Agustus</td><td>-0,1545% (terendah, satu-satunya bulan negatif)</td></tr>
+              <tr><td>Agustus</td><td>-0,1545% (terendah)</td></tr>
+              <tr><td>September</td><td>-0,0098% (negatif tipis)</td></tr>
             </tbody>
           </table>
         </div>
         <div class="callout callout--insight">
-          <strong>Insight:</strong> Desember punya rata-rata return harian tertinggi, mengindikasikan pola <em>rally akhir tahun</em> <span class="term">(kenaikan harga saham menjelang akhir tahun)</span> yang sering dikaitkan dengan <em>window dressing</em> <span class="term">(manajer investasi "mempercantik" portofolio menjelang laporan akhir tahun)</span> - sementara Agustus satu-satunya bulan dengan rata-rata negatif. Angka ini rata-rata gabungan seluruh tahun, jadi belum menguji apakah polanya berulang di tiap tahun maupun signifikansi statistiknya. Karena itu pola kalender sebaiknya dipakai sebagai konteks tambahan, bukan satu-satunya dasar strategi timing pasar.
+          <strong>Insight:</strong> Desember punya rata-rata return harian tertinggi, mengindikasikan pola <em>rally akhir tahun</em> <span class="term">(kenaikan harga saham menjelang akhir tahun)</span> yang sering dikaitkan dengan <em>window dressing</em> <span class="term">(manajer investasi "mempercantik" portofolio menjelang laporan akhir tahun)</span> - sementara Agustus paling rendah dan hanya Agustus dan September yang rata-ratanya negatif. Angka ini rata-rata gabungan seluruh tahun, jadi belum menguji apakah polanya berulang di tiap tahun maupun signifikansi statistiknya. Karena itu pola kalender sebaiknya dipakai sebagai konteks tambahan, bukan satu-satunya dasar strategi timing pasar.
         </div>
       </article>
 
@@ -396,7 +397,7 @@
         </li>
         <li>
           <strong>Jadikan pola musiman pertimbangan tambahan, bukan strategi utama.</strong>
-          Desember punya rata-rata return harian tertinggi (+0,2015%) dan Agustus satu-satunya yang negatif (-0,1545%), tetapi angka ini rata-rata gabungan seluruh tahun dan belum diuji konsistensinya per tahun.
+          Desember punya rata-rata return harian tertinggi (+0,2015%), sedangkan Agustus (-0,1545%) dan September (-0,0098%) negatif, tetapi angka ini rata-rata gabungan seluruh tahun dan belum diuji konsistensinya per tahun.
         </li>
         <li>
           <strong>Gunakan volume sebagai indikator pelengkap, bukan sinyal utama.</strong>
